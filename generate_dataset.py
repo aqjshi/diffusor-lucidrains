@@ -134,11 +134,11 @@ xyz_arrays = [pad_xyz(xyz) for xyz in xyz_arrays]
 
 
 # Create the directory if it doesn't exist
-os.makedirs('original_matrices', exist_ok=True)
+os.makedirs('original', exist_ok=True)
 
 # Save each padded xyz array to a txt file
 for i, xyz in enumerate(xyz_arrays):
-    np.savetxt(f'original_matrices/{index_array[i]}.txt', xyz)
+    np.savetxt(f'original/{index_array[i]}.txt', xyz)
 
 
 # In[3]:
@@ -246,27 +246,16 @@ def encode_matrix_to_image(matrix, output_file='index.png', image_size=(8, 8)):
     
     # Save using PNG for lossless compression.
     img.save(output_file, format='PNG')
-    # print(f"Encoded matrix saved to {output_file}")
+    print(f"Encoded matrix saved to {output_file}")
 
 
 # Create the directory if it doesn't exist
-os.makedirs('encoded_original_images', exist_ok=True)
+os.makedirs('encoded_images', exist_ok=True)
 
 # Encode each matrix and save to the encoded_images folder
 for i in range(len(index_array)):
-    encode_matrix_to_image(encoded_molecules_matrix[i], output_file=f'encoded_original_images/{index_array[i]}.png', image_size=(64, 64))
+    encode_matrix_to_image(encoded_molecules_matrix[i], output_file=f'encoded_images/{index_array[i]}.png', image_size=(128, 218))
 
-
-# Free memory by deleting large arrays
-del encoded_molecules_matrix
-del chiral_centers_array
-del xyz_arrays
-del index_array
-del inchi_array
-del rotation_array
-
-# Optionally, force garbage collection
-gc.collect()
 
 # In[5]:
 
@@ -275,11 +264,10 @@ import os
 import struct
 import numpy as np
 from PIL import Image
-import gc
 
 
 
-def decode_image_to_matrix(image_path, image_size=(64, 64)):
+def decode_image_to_matrix(image_path, image_size=(128, 128)):
     """
     Decodes an image (created by encode_matrix_to_image) back into the original matrix.
     """
@@ -303,7 +291,7 @@ def decode_image_to_matrix(image_path, image_size=(64, 64)):
         matrix.append(row)
     return np.array(matrix)
 
-def decode_all_images(input_folder='encoded_original_images', output_folder='decoded_original_matrices', image_size=(64, 64)):
+def decode_all_images(input_folder='encoded_images', output_folder='decoded_matrices', image_size=(128, 128)):
     """
     Decodes all images in the input folder and saves the resulting matrices in the output folder.
     """
@@ -320,9 +308,8 @@ def decode_all_images(input_folder='encoded_original_images', output_folder='dec
             output_filename = filename.replace('.png', '.txt')
             output_path = os.path.join(output_folder, output_filename)
             np.savetxt(output_path, matrix)
-            # print(f"Decoded matrix saved to {output_path}")
+            print(f"Decoded matrix saved to {output_path}")
 
 # Run the decoding process
 decode_all_images()
-
 
